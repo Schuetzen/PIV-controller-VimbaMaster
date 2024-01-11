@@ -1,19 +1,45 @@
-# PIV-controller-VimbaMaster
-Different from PIV-controller, this project designed for Vimba Camera, with better coding, better architecture.
+# PIV-Controller-VimbaMaster: Enhanced Vimba Camera Integration
 
-## Setting Documents - GC1380
+This project, distinct from the original PIV-controller, is specifically tailored for Vimba Cameras. It offers enhanced coding standards and a more robust architectural design. Upon completion of all coding work, this project will seamlessly integrate with the existing PIV-control project.
 
-Path
+**Link to the Former Project (All-in-One):** [PIV-Control Repository](https://github.com/Schuetzen/PIV-control)
+
+## Key Features
+
+* **Exposure Time Setting:** Customize exposure duration for precise imaging.
+* **Image Dimensions:** Set height and width parameters.
+* **Frame Rate Adjustment:** Options include 1.0, 10.0, 20.0 fps.
+* **Config File Reading:** Supports input of floating-point numbers.
+* **Calibration Capture Tools:** Console-based tools for efficient calibration.
+
+## Git Workflow Guidelines
+
+To ensure a consistent and error-free workflow, please follow these Git commands:
+
+```git
+git clone https://github.com/Schuetzen/PIV-controller-VimbaMaster.git
+git add .
+git commit -m "Data(01012024)-v1-time1s.0"
+git push
+```
+
+## Setup Documentation for GC1380
+
+### Library Path Configuration
+
+Set the library path using the following bash command:
+
 ```bash
 export LD_LIBRARY_PATH=/opt/Vimba_6_1/VimbaCPP/DynamicLib/arm_64bit:$LD_LIBRARY_PATH
 ```
 
-### Connecting
-Use Ipv4 connection
+### Connection Setup
 
-* IP Address: 169.254.100.1
-* Subnet mask: 255.255.0.0 
-* Default gateway: blank
+For connecting the device, use an IPv4 configuration:
+
+* **IP Address:** 169.254.100.1
+* **Subnet Mask:** 255.255.0.0
+* **Default Gateway:** Leave this field blank
 
 
 # Troubleshooting
