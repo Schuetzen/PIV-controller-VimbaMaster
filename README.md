@@ -12,6 +12,9 @@ This project, distinct from the original PIV-controller, is specifically tailore
 * **Config File Reading:** Supports input of floating-point numbers.
 * **Calibration Capture Tools:** Console-based tools for efficient calibration.
 
+## Reminds
+* error: Segmentation fault
+
 ## Git Workflow Guidelines
 
 To ensure a consistent and error-free workflow, please follow these Git commands:

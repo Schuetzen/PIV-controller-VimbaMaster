@@ -36,7 +36,7 @@ public:
 
                 // Save the image
                 stringstream filename;
-                filename << imageDirectory << "/image" << setfill('0') << setw(7) << m_frameCounter << ".tiff";
+                filename << imageDirectory << "/image" << setfill('0') << setw(7) << m_frameCounter << ".png";
                 imwrite(filename.str(), img);
 
                 // Stop acquisition after reaching the desired number of frames
@@ -99,7 +99,7 @@ unordered_map<string, string> SetCameraParameters(CameraPtr camera)
 
     err = camera->GetFeatureByName("TriggerSource", feature);
     if (VmbErrorSuccess == err) {
-        err = feature->SetValue("FixedRate"); // FixedRate, Line1, Line2, Freerun, software
+        err = feature->SetValue("Line1"); // FixedRate, Line1, Line2, Freerun, software
         if (VmbErrorSuccess != err) {
             // Handle error
             cout<<"TriggerSource set Failed, Error: "<<err<<endl;
