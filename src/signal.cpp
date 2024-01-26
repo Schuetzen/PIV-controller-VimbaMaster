@@ -1,5 +1,5 @@
 // signal.cpp
-
+#include "stdafx.h"
 #include "signal.h"
 #include <iostream>
 #include <unistd.h> // For sleep function
@@ -10,14 +10,30 @@
 const char* chipName = "gpiochip4"; // Adjust as needed
 unsigned int cameraLine = 17;          // Adjust as needed
 unsigned int laserLine = 27;
+
+const int FLASH_DURATION = 1; // Duration of the flash signal in milliseconds
+
 bool Signal() {
-    int exposure = 60;
-    int dur = 10;
-    int freq = 4;
-    int dt = 3;
-    int laser_on = 2;
-    int ext = 0; 
-    int flash = 1;
+
+    auto config = readConfigFile();
+    unordered_map<string, string> configValues = readConfigFile();
+    
+    float exposure = stof(configValues["exposure_time_in_ms"]);
+    float dur = stof(configValues["duration_in_sec"]);
+    int freq = stoi(configValues["frequency_in_Hz"]);
+    float dt = stof(configValues["delta_t_in_ms"]);
+    float laser_on = stof(configValues["laser_on_in_ms"]);
+    int ext = stoi(configValues["extension_in_sec"]);
+
+    //int exposure = 60;
+    //int dur = 10;
+    //int freq = 4;
+    //int dt = 3;
+    //int laser_on = 2;
+    //int ext = 0; 
+
+
+    int flash = FLASH_DURATION;
 
     int laser_flash = laser_on - flash;
     int exp_flash = exposure-flash - laser_on;

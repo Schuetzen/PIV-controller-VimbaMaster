@@ -77,7 +77,7 @@ unordered_map<string, string> SetCameraParameters(CameraPtr camera)
     float exposure = stof(configValues["exposure_time_in_ms"]);
     int height = stoi(configValues["Height"]);
     int width = stoi(configValues["Width"]);
-    float frequency = stof(configValues["Frequency"]);
+    float framerate = stof(configValues["FrameRate"]);
     exposure *= 1000;
     FeaturePtr feature;
     VmbErrorType err;
@@ -123,12 +123,12 @@ unordered_map<string, string> SetCameraParameters(CameraPtr camera)
     // STEP4. To fix camera frame rate set AcquisitionFrameRateEnable = true. This makes AcquisitionFrameRate writable
     err = camera->GetFeatureByName("AcquisitionFrameRateAbs", feature);
     if (VmbErrorSuccess == err) {
-        err = feature->SetValue(frequency);
+        err = feature->SetValue(framerate);
         if (VmbErrorSuccess != err) {
             // Handle error
             cout<<"FrameRate Set Failed. Error: "<<err<<endl;
         }else{
-            cout<<"AcquisitionFrameRateAbs. Frame Rate (Abs): "<<frequency<<endl;
+            cout<<"AcquisitionFrameRateAbs. Frame Rate (Abs): "<<framerate<<endl;
         }
     }else{
         cout<<"FrameRate Set Failed. Error: "<<err<<endl;
