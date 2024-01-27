@@ -21,6 +21,7 @@ public:
     FrameObserver(CameraPtr pCamera, unsigned int numFrames) 
         : IFrameObserver(pCamera), m_frameCounter(0), m_numFrames(numFrames) {
         imageDirectory = CreateImageDirectory();
+        cout<<"Image Directory Created"<<endl;
     }
 
     void FrameReceived(const FramePtr pFrame) {
@@ -37,6 +38,7 @@ public:
                 Mat img(height, width, CV_16UC1, pImage);
 
                 // Save the image
+                cout<<"Saving Image ..."<<endl;
                 stringstream filename;
                 filename << imageDirectory << "/image" << setfill('0') << setw(7) << m_frameCounter << ".tif";
                 imwrite(filename.str(), img);
@@ -44,6 +46,7 @@ public:
                 // Stop acquisition after reaching the desired number of frames
                 if (++m_frameCounter >= m_numFrames) {
                     this->m_pCamera->StopContinuousImageAcquisition();
+                    cout<<"Image Acquisition Stopped"<<endl;
                 }
             } else {
                 cerr << "Error: Failed to get image from frame." << endl;
@@ -121,7 +124,7 @@ unordered_map<string, string> SetCameraParameters(CameraPtr camera)
     }
 
     // STEP4. To fix camera frame rate set AcquisitionFrameRateEnable = true. This makes AcquisitionFrameRate writable
-    err = camera->GetFeatureByName("AcquisitionFrameRateAbs", feature);
+/*     err = camera->GetFeatureByName("AcquisitionFrameRateAbs", feature);
     if (VmbErrorSuccess == err) {
         err = feature->SetValue(framerate);
         if (VmbErrorSuccess != err) {
@@ -132,7 +135,7 @@ unordered_map<string, string> SetCameraParameters(CameraPtr camera)
         }
     }else{
         cout<<"FrameRate Set Failed. Error: "<<err<<endl;
-    }
+    } */
 
 
         // Set Image Height
@@ -182,6 +185,8 @@ int Grab() {
     if (VmbErrorSuccess != err) {
         cerr << "Could not start Vimba system: " << err << endl;
         return -1;
+    }else{
+        cout<<"Vimba System Started Successfully"<<endl;
     }
 
     CameraPtrVector cameras;
@@ -190,6 +195,8 @@ int Grab() {
         cerr << "No cameras found!" << endl;
         sys.Shutdown();
         return -1;
+    }else{
+        cout<<"Camera Found Successfully"<<endl;
     }
 
     CameraPtr camera = cameras[0];
@@ -198,6 +205,8 @@ int Grab() {
         cerr << "Could not open camera: " << err << endl;
         sys.Shutdown();
         return -1;
+    }else{
+        cout<<"Camera Opened Successfully"<<endl;
     }
 
     auto configValues = SetCameraParameters(camera);
@@ -209,6 +218,8 @@ int Grab() {
         camera->Close();
         sys.Shutdown();
         return -1;
+    }else{
+        cout<<"Camera Parameters Set Successfully"<<endl;
     }
     
     err = camera->StartContinuousImageAcquisition(num_frames, IFrameObserverPtr(&observer));
@@ -217,20 +228,28 @@ int Grab() {
         camera->Close();
         sys.Shutdown();
         return -1;
+    }else{
+        cout<<"Image Acquisition Started Successfully"<<endl;
     }
 
-    while (observer.GetFrameCounter() < num_frames) {}
+    while (observer.GetFrameCounter() < num_frames) {
+        cout<<"Waiting for "<<num_frames<<" frames"<<endl;
+    }
 
     camera->Close();
+    cout<<"Camera Closed Successfully"<<endl;
     sys.Shutdown();
 
     return 0;
 }
 
 int main(int argc, char* argv[]) {
+
+    cout<<"Grabbing Images"<<endl;
     // Create thread for Grab function
     std::thread grabThread(Grab);
 
+    cout<<"Signaling"<<endl;
     // Create thread for Signal function
     std::thread signalThread(Signal);
 
