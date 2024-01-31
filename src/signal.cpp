@@ -1,11 +1,12 @@
 // signal.cpp
-#include "stdafx.h"
+
 #include "signal.h"
 #include <iostream>
 #include <unistd.h> // For sleep function
 #include <gpiod.h>  // Assuming you have a library for GPIO control
 #include <chrono>
 #include <thread>
+#include "stdafx.h"
 
 const char* chipName = "gpiochip4"; // Adjust as needed
 unsigned int cameraLine = 17;          // Adjust as needed
@@ -24,14 +25,6 @@ bool Signal() {
     float dt = stof(configValues["delta_t_in_ms"]);
     float laser_on = stof(configValues["laser_on_in_ms"]);
     int ext = stoi(configValues["extension_in_sec"]);
-
-    //int exposure = 60;
-    //int dur = 10;
-    //int freq = 4;
-    //int dt = 3;
-    //int laser_on = 2;
-    //int ext = 0; 
-
 
     int flash = FLASH_DURATION;
 
@@ -76,6 +69,7 @@ bool Signal() {
         return false;
     }
 
+    PrintCurrentTimeAndMessage("Signal Start");
     // Blink an LED attached to the line
     auto start_time = std::chrono::steady_clock::now();
     while(true) {
@@ -96,7 +90,7 @@ bool Signal() {
 
         // Turn laser on
         gpiod_line_set_value(Laserline, 1);
-        std::this_thread::sleep_for(std::chrono::microseconds(dt * 1000));
+        std::this_thread::sleep_for(std::chrono::microseconds(static_cast<long>(dt * 1000)));
 
         // Turn camera on again
         gpiod_line_set_value(Camline, 1);

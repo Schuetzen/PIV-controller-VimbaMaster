@@ -21,32 +21,36 @@ public:
     FrameObserver(CameraPtr pCamera, unsigned int numFrames) 
         : IFrameObserver(pCamera), m_frameCounter(0), m_numFrames(numFrames) {
         imageDirectory = CreateImageDirectory();
-        cout<<"Image Directory Created"<<endl;
     }
 
     void FrameReceived(const FramePtr pFrame) {
+        PrintCurrentTimeAndMessage("Step1");
         VmbFrameStatusType eReceiveStatus;
         // Check if frame received successfully
+        PrintCurrentTimeAndMessage("Step1.5");
+        cout<<eReceiveStatus<<endl;
         if (VmbErrorSuccess == pFrame->GetReceiveStatus(eReceiveStatus) && VmbFrameStatusComplete == eReceiveStatus) {
             VmbUchar_t *pImage;
+            PrintCurrentTimeAndMessage("Step2");
             if (VmbErrorSuccess == pFrame->GetImage(pImage) && pImage != nullptr) {
                 VmbUint32_t width, height;
                 pFrame->GetWidth(width);
                 pFrame->GetHeight(height);
-
+                PrintCurrentTimeAndMessage("Step3");
                 // Assuming the pixel format is Mono8
                 Mat img(height, width, CV_16UC1, pImage);
 
                 // Save the image
-                cout<<"Saving Image ..."<<endl;
                 stringstream filename;
                 filename << imageDirectory << "/image" << setfill('0') << setw(7) << m_frameCounter << ".tif";
                 imwrite(filename.str(), img);
-
+                bool isSaved = imwrite(filename.str(), img);
+                if (!isSaved) {
+                    cerr << "Error: Failed to save image." << endl;
+                }
                 // Stop acquisition after reaching the desired number of frames
                 if (++m_frameCounter >= m_numFrames) {
                     this->m_pCamera->StopContinuousImageAcquisition();
-                    cout<<"Image Acquisition Stopped"<<endl;
                 }
             } else {
                 cerr << "Error: Failed to get image from frame." << endl;
@@ -75,6 +79,7 @@ Error handling should be implemented for each parameter set operation.
 */
 unordered_map<string, string> SetCameraParameters(CameraPtr camera)
 {
+    PrintCurrentTimeAndMessage("Setup Start");
     // Before task -> read config.ini and make sure the signal has open
     unordered_map<string, string> configValues = readConfigFile();
     float exposure = stof(configValues["exposure_time_in_ms"]);
@@ -123,8 +128,8 @@ unordered_map<string, string> SetCameraParameters(CameraPtr camera)
         cerr << "Could not set pixel format: " << err << endl;
     }
 
-    // STEP4. To fix camera frame rate set AcquisitionFrameRateEnable = true. This makes AcquisitionFrameRate writable
-/*     err = camera->GetFeatureByName("AcquisitionFrameRateAbs", feature);
+    /* // STEP4. To fix camera frame rate set AcquisitionFrameRateEnable = true. This makes AcquisitionFrameRate writable
+    err = camera->GetFeatureByName("AcquisitionFrameRateAbs", feature);
     if (VmbErrorSuccess == err) {
         err = feature->SetValue(framerate);
         if (VmbErrorSuccess != err) {
@@ -174,11 +179,13 @@ unordered_map<string, string> SetCameraParameters(CameraPtr camera)
         cout<<"ExposureTime Set Failed, Error: "<<err<<endl;
     }
 
+    PrintCurrentTimeAndMessage("Parameter Setup Done");
     // Return the configuration values
     return configValues;
 }
 
 int Grab() {
+    PrintCurrentTimeAndMessage("Grab Start");
     VimbaSystem& sys = VimbaSystem::GetInstance();
     
     VmbErrorType err = sys.Startup();
@@ -186,7 +193,8 @@ int Grab() {
         cerr << "Could not start Vimba system: " << err << endl;
         return -1;
     }else{
-        cout<<"Vimba System Started Successfully"<<endl;
+        PrintCurrentTimeAndMessage("Start Vimba System");
+        cout<<err<<endl;
     }
 
     CameraPtrVector cameras;
@@ -196,19 +204,47 @@ int Grab() {
         sys.Shutdown();
         return -1;
     }else{
-        cout<<"Camera Found Successfully"<<endl;
+        PrintCurrentTimeAndMessage("Camera Found");
+        cout<<err<<endl;
     }
-
+    
     CameraPtr camera = cameras[0];
     err = camera->Open(VmbAccessModeFull);
     if (VmbErrorSuccess != err) {
         cerr << "Could not open camera: " << err << endl;
         sys.Shutdown();
         return -1;
-    }else{
-        cout<<"Camera Opened Successfully"<<endl;
+    } else {
+        PrintCurrentTimeAndMessage("Open the camera");
+        cout << "Error is: " << err << endl;
+
+        // Retrieve and print the Camera ID
+        std::string cameraID;
+        err = camera->GetID(cameraID);
+        if (VmbErrorSuccess == err) {
+            cout << "Camera ID: " << cameraID << endl;
+        } else {
+            cerr << "Failed to get Camera ID: " << err << endl;
+        }
+        FeaturePtr pCommandFeature;
+        if (VmbErrorSuccess == camera->GetFeatureByName("GVSPAdjustPacketSize", pCommandFeature)) {
+            if (VmbErrorSuccess == pCommandFeature->RunCommand()) {
+                bool bIsCommandDone = false;
+                do {
+                    if (VmbErrorSuccess != pCommandFeature->IsCommandDone(bIsCommandDone)) {
+                        cerr << "Error: Failed to complete GVSPAdjustPacketSize command." << endl;
+                        break;
+                    }
+                } while (!bIsCommandDone);
+            } else {
+                cerr << "Error: Failed to run GVSPAdjustPacketSize command." << endl;
+            }
+        } else {
+            cerr << "Error: GVSPAdjustPacketSize feature not found." << endl;
+        }
     }
 
+    
     auto configValues = SetCameraParameters(camera);
     unsigned int num_frames = stoi(configValues["num_frames"]);
     FrameObserver observer(camera, num_frames);
@@ -219,7 +255,7 @@ int Grab() {
         sys.Shutdown();
         return -1;
     }else{
-        cout<<"Camera Parameters Set Successfully"<<endl;
+        PrintCurrentTimeAndMessage("No Error setting camera parameters");
     }
     
     err = camera->StartContinuousImageAcquisition(num_frames, IFrameObserverPtr(&observer));
@@ -229,15 +265,15 @@ int Grab() {
         sys.Shutdown();
         return -1;
     }else{
-        cout<<"Image Acquisition Started Successfully"<<endl;
+        PrintCurrentTimeAndMessage("Could start image acquisition");
+        cout<<"Error is:"<<err<<endl;
     }
 
     while (observer.GetFrameCounter() < num_frames) {
-        cout<<"Waiting for "<<num_frames<<" frames"<<endl;
+        //PrintCurrentTimeAndMessage("Captured Frames");
     }
 
     camera->Close();
-    cout<<"Camera Closed Successfully"<<endl;
     sys.Shutdown();
 
     return 0;
@@ -245,11 +281,10 @@ int Grab() {
 
 int main(int argc, char* argv[]) {
 
-    cout<<"Grabbing Images"<<endl;
+    PrintCurrentTimeAndMessage("Program Start");
     // Create thread for Grab function
     std::thread grabThread(Grab);
 
-    cout<<"Signaling"<<endl;
     // Create thread for Signal function
     std::thread signalThread(Signal);
 
