@@ -22,7 +22,7 @@ To ensure a consistent and error-free workflow, please follow these Git commands
 ```git
 git clone https://github.com/Schuetzen/PIV-controller-VimbaMaster.git
 git add .
-git commit -m "Data(01012024)-v1-time1s.0"
+git commit -m "comment"
 git push
 ```
 
@@ -44,6 +44,18 @@ For connecting the device, use an IPv4 configuration:
 * **Subnet Mask:** 255.255.0.0
 * **Default Gateway:** Leave this field blank
 
+
+
+
+# Update Information
+| Version                | Time | Comment                                                                                              |
+|---------------------------|-------|-----------------------------------------------------------------------------------------------------------|
+|v1.0.0|Jan 11 2024|  Initial comment, fix out the fixed rate|
+|v1.0.1|Jan 17 2024| Update the Multiframe capture method|
+|v1.1.1-beta|Jan 25 2024|Successfully measured the PIV image|
+|v1.1.2|Jan 27 2024| Update Mono12|
+|v1.1.3|Jan 30 2024| Clean folder|
+|v1.2.0|Feb 8 2024| Reorganized Readme, Version control; Pack Mono12 Viewer; Prepare function for shadowimage|
 
 # Troubleshooting
 
@@ -70,13 +82,3 @@ For connecting the device, use an IPv4 configuration:
 | VmbErrorNotSupported      | -18   | API feature is not supported                                                                              |
 | VmbErrorIncomplete        | -19   | The current operation was not completed (e.g. a multiple registers read or write)                         |
 | VmbErrorIO                | -20   | There was an error during read or write with devices (camera or disk)                                     |
-
-# Update Information
-| Version                | Time | Comment                                                                                              |
-|---------------------------|-------|-----------------------------------------------------------------------------------------------------------|
-|v1.0.0|Jan 11 2024|  Initial comment, fix out the fixed rate|
-|v1.0.1|Jan 17 2024| Update the Multiframe capture method|
-|v1.1.1-beta|Jan 25 2024|Successfully measured the PIV image|
-|v1.1.2|Jan 27 2024| Update Mono12|
-|v1.1.3|Jan 30 2024| Clean folder|
-|v1.2.0|Feb 8 2024| Reorganized Readme, Version control; Pack Mono12 Viewer; Prepare function for shadowimage|
