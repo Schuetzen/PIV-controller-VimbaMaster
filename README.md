@@ -12,9 +12,6 @@ This project, distinct from the original PIV-controller, is specifically tailore
 * **Config File Reading:** Supports input of floating-point numbers.
 * **Calibration Capture Tools:** Console-based tools for efficient calibration.
 
-## Reminds
-* error: Segmentation fault
-
 ## Git Workflow Guidelines
 
 To ensure a consistent and error-free workflow, please follow these Git commands:
@@ -22,19 +19,55 @@ To ensure a consistent and error-free workflow, please follow these Git commands
 ```git
 git clone https://github.com/Schuetzen/PIV-controller-VimbaMaster.git
 git add .
-git commit -m "comment"
+git commit -m "Your descriptive commit message"
 git push
+
 ```
 
-## Setup Documentation for GC1380
+### Vimba SDK Setup (Vimba v6.1)
+
+Download the Vimba SDK from the following link: [Vimba SDK Download](https://www.alliedvision.com/en/products/vimba-sdk/)
+
+Extract the SDK with:
+
+```bash
+sudo tar -xvzf Vimba_v6.1_ARM64.tgz -C /opt
+```
+
+Update the GigE interface:
+
+```bash
+sudo bash /opt/Vimba_6_0/VimbaGigETL/Install.sh
+```
 
 ### Library Path Configuration
 
-Set the library path using the following bash command:
+Update and install necessary libraries:
+
+```bash
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install libtbbmalloc2 libjpeg-dev libtiff5-dev libpng-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libxvidcore-dev libx264-dev libgtk-3-dev libatlas-base-dev gfortran python3-pip python3-xyz cmake build-essential pkg-config
+```
+
+Install OpenCV:
+
+```bash
+sudo apt-get install libopencv-dev
+```
+
+Install GPIO control libraries:
+
+```bash
+sudo apt-get install lgpio libgpiod-dev liblgpio-dev
+```
+
+Configure the library path:
 
 ```bash
 export LD_LIBRARY_PATH=/opt/Vimba_6_1/VimbaCPP/DynamicLib/arm_64bit:$LD_LIBRARY_PATH
 ```
+
 
 ### Connection Setup
 
@@ -43,8 +76,6 @@ For connecting the device, use an IPv4 configuration:
 * **IP Address:** 169.254.100.1
 * **Subnet Mask:** 255.255.0.0
 * **Default Gateway:** Leave this field blank
-
-
 
 
 # Update Information
@@ -56,6 +87,8 @@ For connecting the device, use an IPv4 configuration:
 |v1.1.2|Jan 27 2024| Update Mono12|
 |v1.1.3|Jan 30 2024| Clean folder|
 |v1.2.0|Feb 8 2024| Reorganized Readme, Version control; Pack Mono12 Viewer; Prepare function for shadowimage|
+|v1.2.1|Feb 12 2024| Update Vimba SDK 6.0 inside; Update Setup; Remove `sample` folder|
+
 
 # Troubleshooting
 
@@ -67,7 +100,7 @@ For connecting the device, use an IPv4 configuration:
 | VmbErrorNotFound          | -3    | The designated instance (camera, feature, etc.) cannot be found                                           |
 | VmbErrorBadHandle         | -4    | The given handle is not valid                                                                             |
 | VmbErrorDeviceNotOpen     | -5    | Device was not opened for usage                                                                           |
-| VmbErrorInvalidAccess     | -6    | Operation is invalid with the current access mode                                                        |
+| VmbErrorInvalidAccess     | -6    | Operation is invalid with the current access mode                                                         |
 | VmbErrorBadParameter      | -7    | One of the parameters is invalid (usually an illegal pointer)                                             |
 | VmbErrorStructSize        | -8    | The given struct size is not valid for this version of the API                                            |
 | VmbErrorMoreData          | -9    | More data available in a string/list than space is provided                                               |
